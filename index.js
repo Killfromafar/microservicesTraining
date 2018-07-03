@@ -2,6 +2,9 @@ var express = require("express");
 var bodyParser = require("body-parser");
 
 var getPodcastCommand = require("./getPodcastCommand");
+var aggregateRoot = require("./aggregateRoot");
+var buildCard = require("./buildCard");
+var buildResponse = require('./buildResponse');
 var bus = require('./eventBus');
 
 var app = express();
@@ -9,11 +12,47 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post("/", function (req, res) {
-  console.log('PLACE2');
+  var streamBuilt = false;
+  var cardBuilt = false;
+  aggregateRoot.userId = req.userId;
 
-  bus.on('PodcastRetrieved', function () {
-    console.log('Received the podcast: ' + JSON.stringify(podcast));
+  bus.on('ResponseReady', function (appResponse) {
+    console.log('About to respond to express: ' + JSON.stringify(appResponse));
     res.sendStatus(200);
+  });
+
+  var appResponse = {
+
+  }
+  bus.on('responsePartiallyReady', function (partialResponse) {
+    console.log('PARTIAL RESPONSE LISTENER...');
+    if (partialResponse.card) { 
+      appResponse.card = partialResponse.card
+    }
+    if (partialResponse.stream) {
+      appResponse.stream = partialResponse.stream
+    }
+    if (streamBuilt && cardBuilt) {
+      bus.emit('ResponseReady', appResponse);
+    }
+  });
+
+  bus.on('StreamUrlBuilt', function (streamResponse) {
+    console.log('STEAM BUILT LISTENER');
+    var appResponse = {
+      stream: streamResponse.streamUrl
+    }
+    streamBuilt = true;
+    bus.emit('responsePartiallyReady', appResponse);
+  });
+  
+  bus.on('CardBuilt', function (cardResponse) {
+    console.log('CARD BUILT LISTENER: ');
+    var appResponse = {
+      card: cardResponse
+    }
+    cardBuilt = true;
+    bus.emit('responsePartiallyReady', appResponse);
   });
 
   bus.on('FAILURE', function () {
@@ -21,8 +60,9 @@ app.post("/", function (req, res) {
     res.sendStatus(404);
   });
 
+  console.log('PLACE1');
   //execute command
-  getPodcastCommand(req, res);
+  getPodcastCommand(req);
 });
 
 //get route just to test exptress is working via browser
