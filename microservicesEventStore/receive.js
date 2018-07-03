@@ -14,7 +14,12 @@ amqp.connect(
         q,
         function(msg) {
           console.log(" [x] Received %s", msg.content.toString());
-          global.eventList.push(msg.content.toString());
+          event = {
+            timestamp: Date.now(),
+            message: msg.content.toString()
+          };
+
+          global.eventList.push(JSON.stringify(event));
         },
         { noAck: true }
       );
