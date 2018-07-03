@@ -98,9 +98,10 @@ app.get("/", function(req, res) {
 });
 
 request("http://localhost:3002", function(error, response, body) {
-  const podcastList = body.map(event => {
+  const podcastList = JSON.parse(body).map(event => {
     console.log(event);
-    return { message: event.message };
+    console.log(JSON.parse(event).message);
+    return { message: JSON.parse(event).message };
   });
   bus.emit("PodcastPostList", podcastList);
 });
