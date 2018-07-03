@@ -35,8 +35,8 @@ bus.on("GetPodcast", function(podcastId) {
   }
 });
 
-bus.on("PostPodcastList", function(podcastList) {
-  console.log(podcastList);
+bus.on("PodcastPostList", function(podcastList) {
+  console.log("BANANANANANANANA", podcastList);
   // podcasts.concat(podcastList);
   // bus.emit("PodcastListPosted");
 });

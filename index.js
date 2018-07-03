@@ -13,10 +13,6 @@ var app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-request("localhost:3002", function(error, response, body) {
-  bus.emit("PodcastPostList", body);
-});
-
 function queueResponse(response) {
   amqp.connect(
     "amqp://localhost",
@@ -99,6 +95,14 @@ app.post("/", function(req, res) {
 app.get("/", function(req, res) {
   console.log("working");
   res.sendStatus(200);
+});
+
+request("http://localhost:3002", function(error, response, body) {
+  // console.log('sduyfgywgf');
+  // console.log('response', response);
+  // console.log('error', error);
+  console.log(body)
+  bus.emit("PodcastPostList", body);
 });
 
 app.listen(3000, () => console.log("Example app listening on port 3000!"));
