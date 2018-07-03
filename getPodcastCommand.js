@@ -39,7 +39,7 @@ bus.on("GetPodcast", function(podcastId) {
 
 bus.on("PodcastPostList", function(podcastList) {
   console.log("BANANANANANANANA", podcastList);
-  podcastsView.concat(podcastList);
+  podcastsView.push(...podcastList);
   console.log("Ben podcasts view: ", podcastsView);
   bus.emit("PodcastListPosted");
 });
