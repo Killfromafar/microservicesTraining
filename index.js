@@ -15,12 +15,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 function queueResponse(response){
   amqp.connect('amqp://localhost', function(err, conn) {
     conn.createChannel(function(err, ch) {
-      var q = 'fisherPriceQueue';
+      var q = 'serviceBQueue';
 
       ch.assertQueue(q, {durable: false});
       // Note: on Node 6 Buffer.from(msg) should be used
       ch.sendToQueue(q, new Buffer(JSON.stringify(response)));
-      console.log(" [x] Sent %s", response);
+      console.log(" [x] serviceBQueue Sent %s", response);
+    });
+
+    conn.createChannel(function(err, ch) {
+      var q = 'serviceCQueue';
+
+      ch.assertQueue(q, {durable: false});
+      // Note: on Node 6 Buffer.from(msg) should be used
+      ch.sendToQueue(q, new Buffer(JSON.stringify(response)));
+      console.log(" [x] serviceCQueue Sent %s", response);
     });
     // setTimeout(function() { conn.close(); process.exit(0) }, 500);
   });
