@@ -22,7 +22,7 @@ function queueResponse(response){
       ch.sendToQueue(q, new Buffer(JSON.stringify(response)));
       console.log(" [x] Sent %s", response);
     });
-    setTimeout(function() { conn.close(); process.exit(0) }, 500);
+    // setTimeout(function() { conn.close(); process.exit(0) }, 500);
   });
 }
 
