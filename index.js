@@ -98,11 +98,11 @@ app.get("/", function(req, res) {
 });
 
 request("http://localhost:3002", function(error, response, body) {
-  // console.log('sduyfgywgf');
-  // console.log('response', response);
-  // console.log('error', error);
-  console.log(body)
-  bus.emit("PodcastPostList", body);
+  const podcastList = body.map(event => {
+    console.log(event);
+    return { message: event.message };
+  });
+  bus.emit("PodcastPostList", podcastList);
 });
 
 app.listen(3000, () => console.log("Example app listening on port 3000!"));

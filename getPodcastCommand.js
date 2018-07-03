@@ -24,6 +24,8 @@ const podcasts = [
   }
 ];
 
+const podcastsView = [];
+
 bus.on("GetPodcast", function(podcastId) {
   console.log("GETTING PODCAST...");
   const podcast = podcasts.find(pc => pc.podcastId === podcastId);
@@ -37,6 +39,7 @@ bus.on("GetPodcast", function(podcastId) {
 
 bus.on("PodcastPostList", function(podcastList) {
   console.log("BANANANANANANANA", podcastList);
-  // podcasts.concat(podcastList);
-  // bus.emit("PodcastListPosted");
+  podcastsView.concat(podcastList);
+  console.log("Ben podcasts view: ", podcastsView);
+  bus.emit("PodcastListPosted");
 });
