@@ -1,21 +1,34 @@
 var bus = require("./eventBus");
 
+const podcasts = [
+  {
+    podcastId: "theArchersId",
+    podcastName: "The Archers",
+    podcastStreamUrl: "http://www.plz-dont-hack.io"
+  },
+  {
+    podcastId: "worldCupId",
+    podcastName: "World Cup",
+    podcastStreamUrl: "http://www.plz-dont-hack-goalhole.io"
+  },
+  {
+    podcastId: "wimbledonId",
+    podcastName: "Wimbledon",
+    podcastStreamUrl: "http://www.plz-dont-hack-tennis.io"
+  }
+];
+
 bus.on("GetPodcast", function(podcastId) {
   console.log("GETTING PODCAST...");
-  const podcast = podcastId
-    ? {
-        podcastName: "The Archers",
-        podcastDuration: 7000,
-        podcastStreamUrl: "http://plz-dont-hack.io",
-        token: "b006gpr",
-        publishDate: "12/06/2018",
-        brandImage: "http://bbcImage.com",
-        brandName: "The Archers"
-      }
-    : null;
+  const podcast = podcasts.find(pc => pc.podcastId === podcastId);
   if (podcast) {
     bus.emit("PodcastRetrieved", podcast);
   } else {
     bus.emit("FAILURE");
   }
+});
+
+bus.on("PostPodcast", function(podcast) {
+  podcasts.push(podcast);
+  bus.emit("PodcastPosted");
 });
