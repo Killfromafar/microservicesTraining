@@ -6,10 +6,25 @@ var aggregateRoot = require("./aggregateRoot");
 var buildCard = require("./buildCard");
 var buildResponse = require("./buildResponse");
 var bus = require("./eventBus");
+var amqp = require('amqplib/callback_api');
 
 var app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+function queueResponse(response){
+  amqp.connect('amqp://localhost', function(err, conn) {
+    conn.createChannel(function(err, ch) {
+      var q = 'fisherPriceQueue';
+
+      ch.assertQueue(q, {durable: false});
+      // Note: on Node 6 Buffer.from(msg) should be used
+      ch.sendToQueue(q, new Buffer(JSON.stringify(response)));
+      console.log(" [x] Sent %s", response);
+    });
+    setTimeout(function() { conn.close(); process.exit(0) }, 500);
+  });
+}
 
 app.post("/", function(req, res) {
   var streamBuilt = false;
@@ -18,6 +33,7 @@ app.post("/", function(req, res) {
 
   bus.on("ResponseReady", function(appResponse) {
     console.log("About to respond to express: " + JSON.stringify(appResponse));
+    queueResponse(appResponse);
     res.sendStatus(200);
   });
 
