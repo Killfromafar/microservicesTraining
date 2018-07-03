@@ -28,7 +28,8 @@ bus.on("GetPodcast", function(podcastId) {
   }
 });
 
-bus.on("PostPodcast", function(podcast) {
-  podcasts.push(podcast);
-  bus.emit("PodcastPosted");
+bus.on("PostPodcastList", function(podcastList) {
+  console.log(podcastList);
+  // podcasts.concat(podcastList);
+  // bus.emit("PodcastListPosted");
 });

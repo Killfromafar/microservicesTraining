@@ -1,38 +1,46 @@
 var express = require("express");
 var bodyParser = require("body-parser");
+var request = require("request");
 
 var getPodcastCommand = require("./getPodcastCommand");
 var aggregateRoot = require("./aggregateRoot");
 var buildCard = require("./buildCard");
 var buildResponse = require("./buildResponse");
 var bus = require("./eventBus");
-var amqp = require('amqplib/callback_api');
+var amqp = require("amqplib/callback_api");
 
 var app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-function queueResponse(response){
-  amqp.connect('amqp://localhost', function(err, conn) {
-    conn.createChannel(function(err, ch) {
-      var q = 'serviceBQueue';
+request("localhost:3002", function(error, response, body) {
+  bus.emit("PodcastPostList", body);
+});
 
-      ch.assertQueue(q, {durable: false});
-      // Note: on Node 6 Buffer.from(msg) should be used
-      ch.sendToQueue(q, new Buffer(JSON.stringify(response)));
-      console.log(" [x] serviceBQueue Sent %s", response);
-    });
+function queueResponse(response) {
+  amqp.connect(
+    "amqp://localhost",
+    function(err, conn) {
+      conn.createChannel(function(err, ch) {
+        var q = "serviceBQueue";
 
-    conn.createChannel(function(err, ch) {
-      var q = 'serviceCQueue';
+        ch.assertQueue(q, { durable: false });
+        // Note: on Node 6 Buffer.from(msg) should be used
+        ch.sendToQueue(q, new Buffer(JSON.stringify(response)));
+        console.log(" [x] serviceBQueue Sent %s", response);
+      });
 
-      ch.assertQueue(q, {durable: false});
-      // Note: on Node 6 Buffer.from(msg) should be used
-      ch.sendToQueue(q, new Buffer(JSON.stringify(response)));
-      console.log(" [x] serviceCQueue Sent %s", response);
-    });
-    // setTimeout(function() { conn.close(); process.exit(0) }, 500);
-  });
+      conn.createChannel(function(err, ch) {
+        var q = "serviceCQueue";
+
+        ch.assertQueue(q, { durable: false });
+        // Note: on Node 6 Buffer.from(msg) should be used
+        ch.sendToQueue(q, new Buffer(JSON.stringify(response)));
+        console.log(" [x] serviceCQueue Sent %s", response);
+      });
+      // setTimeout(function() { conn.close(); process.exit(0) }, 500);
+    }
+  );
 }
 
 app.post("/", function(req, res) {
