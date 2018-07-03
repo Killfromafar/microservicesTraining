@@ -10,7 +10,7 @@ function getPodcastCommand(request) {
     bus.emit('PodcastRetrieved', podcast);
   } else { 
     console.log('PLACE4');
-    eventEmitter.emit('FAILURE');
+    bus.emit('FAILURE');
   }
 }
 
