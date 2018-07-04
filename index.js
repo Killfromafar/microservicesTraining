@@ -97,13 +97,13 @@ app.get("/", function(req, res) {
   res.sendStatus(200);
 });
 
-request("http://localhost:3002", function(error, response, body) {
-  const podcastList = JSON.parse(body).map(event => {
-    console.log(event);
-    console.log(JSON.parse(event).message);
-    return { message: JSON.parse(event).message };
-  });
-  bus.emit("PodcastPostList", podcastList);
-});
+// request("http://localhost:3002", function(error, response, body) {
+//   const podcastList = JSON.parse(body).map(event => {
+//     console.log(event);
+//     console.log(JSON.parse(event).message);
+//     return { message: JSON.parse(event).message };
+//   });
+//   bus.emit("PodcastPostList", podcastList);
+// });
 
 app.listen(3000, () => console.log("Example app listening on port 3000!"));
