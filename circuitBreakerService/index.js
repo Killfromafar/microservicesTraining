@@ -13,7 +13,7 @@ app.get('/', function (req, res) {
     console.log('circuit breaker code');
 
     global.circuitBreakerOpen = true;
-    res.send('fail');
+    res.send('Circuit breaker triggered');
   }
 
   if (global.circuitBreakerOpen) {
