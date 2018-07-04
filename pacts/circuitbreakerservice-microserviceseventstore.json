@@ -1,0 +1,37 @@
+{
+  "consumer": {
+    "name": "circuitBreakerService"
+  },
+  "provider": {
+    "name": "microservicesEventStore"
+  },
+  "interactions": [
+    {
+      "description": "a request for events",
+      "providerState": "I have a list of events",
+      "request": {
+        "method": "GET",
+        "path": "/"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": [
+          {
+            "card": {
+              "cardContent": "Now playing The Archers from 01/01/18"
+            },
+            "stream": "http://www.plz-dont-hack.io"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

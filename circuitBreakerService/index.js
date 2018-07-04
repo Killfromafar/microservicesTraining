@@ -1,41 +1,38 @@
-var express = require('express');
+var express = require("express");
 var app = express();
-var request = require('request');
+var request = require("request");
+var requestErrorCount = 0;
+var requestErrorThreshold = 2;
 
-function makeRequest() {
-  request("http://localhost:3002", function (error, response, body) {
-    console.log(body);
-
+function makeRequest(res) {
+  request("http://localhost:3002", function(error, response, body) {
     if (error) {
-      circuitBreaker(response, error)
+      if (requestErrorCount === requestErrorThreshold) {
+        circuitBreaker(res, error);
+      } else {
+        requestErrorCount++;
+        res.send("Request Failed!");
+      }
     } else {
-      response.send(body);
+      requestErrorCount = 0;
+      res.send(body);
     }
   });
 }
 
-function circuitBreaker(response, error) {
-  // var circuitBreakerConfig = {
-  //   errorCount: 5,
-  //   timeToReset: 5
-  // };
-  console.log('circuit breaker code');
-
-  setInterval(makeRequest, 3000);
-
-  console.log('response', response);
-  console.log('error', error);
-
+function circuitBreaker(res, error) {
+  setTimeout(function() {
+    global.circuitBreakerOpen = false;
+  }, 5000);
   global.circuitBreakerOpen = true;
-  // response.send('Circuit breaker triggered');
+  res.send("Circuit breaker closed -> open");
 }
 
-app.get('/', function (req, response) {
+app.get("/", function(req, response) {
   if (global.circuitBreakerOpen) {
-    response.send('I am a clever circuit breaker');
+    response.send("Circuit breaker open");
   } else {
-    console.log('Make request');
-    makeRequest();
+    makeRequest(response);
   }
 });
 
